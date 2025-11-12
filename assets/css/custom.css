@@ -1,0 +1,139 @@
+body {
+  font-family: "Poppins", sans-serif;
+  color: #ffffff;
+}
+
+h1, h2{
+  color: #8a1414;
+  letter-spacing: 10px;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+h3, h4{
+  color: #655c0a;
+  letter-spacing: 1px;
+  font-weight: 700;
+  word-spacing: 3px; 
+  line-height: 1.6; 
+}
+
+h5, h6 {
+  font-family: "Montserrat", sans-serif;
+  color: #701066;
+  letter-spacing: 1px;
+  font-weight: 200;
+  font-style: italic;      
+}
+
+.navmenu a {
+  display: inline-block;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.navmenu a:hover {
+  background-color: #ff6600;
+  transform: scale(1.05);
+}
+
+section {
+  padding: 60px 0;
+  margin-bottom: 40px;
+  border: 5px solid #bebebe;  
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+.section {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#header{
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0) 70%, #16181b 100%),
+    url("../img/background1.jfif") center / cover no-repeat;
+}
+#scroll-top {
+  background: #676557;
+  color: #fff;
+}
+#scroll-top:hover {
+  background: #ff6600;
+}
+
+ol{
+  list-style: none;
+  counter-reset: item;
+  padding-left: 0;
+}
+ol li{
+  counter-increment: item;
+  position: relative;
+  padding-left: 1.8rem;   
+}
+ol li::before{
+  content: counter(item) ". ";
+  position: absolute;
+  left: 0; top: 0;
+  color: #ffd166;
+  font-weight: bold;
+}
+
+ul{
+  list-style: none;
+  padding-left: 0;
+}
+ul li{
+  position: relative;
+  padding-left: 1.2rem;  
+}
+ul li::before{
+  content: "• ";
+  position: absolute;
+  left: 0; top: 0;
+  color: #ff6600;
+  font-weight: bold;
+}
+
+.services-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.services-table th,
+.services-table td {
+  padding: 12px 15px;
+}
+
+.services-table thead {
+  background-color: #ff6600;
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.services-table tbody tr:nth-child(even) {
+  background-color: #2a2a2a; 
+}
+
+.services-table tbody tr:nth-child(odd) {
+  background-color: #1d1d1d;
+}
+
+.services-table tbody tr:hover {
+  background-color: #444;
+}
+#services {
+  padding-bottom: 0px;
+  margin-bottom: 0;
+}
