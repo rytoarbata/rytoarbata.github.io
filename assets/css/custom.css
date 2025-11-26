@@ -35,6 +35,44 @@
   border-radius: 10px;          
 }
 
+.success-popup {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #28a745;     
+  color: white;
+  padding: 15px 25px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+  pointer-events: none; 
+  z-index: 9999;
+}
+
+.success-popup.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.input-error {
+  border: 2px solid #ff4d4f !important;
+}
+
+.error-text {
+  color: #ff4d4f;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
 @keyframes gradientFlow {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
@@ -228,4 +266,34 @@ ul li::before{
 
 .contact-links a {
   animation: none !important;
+}
+
+#contact .php-email-form {
+  max-width: 800px;
+  margin: 0 auto;              
+  background: rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+#contact .form-label {
+  font-weight: 600;
+  color: #ffddaa;
+}
+
+#contact .form-control,
+#contact .form-range {
+  border-radius: 8px;
+}
+
+#contact button[type="submit"] {
+  background-color: #ff6600;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 25px;
+}
+
+#contact button[type="submit"]:hover {
+  background-color: #ffa733;
 }
