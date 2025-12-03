@@ -72,6 +72,80 @@ button[disabled] {
   cursor: not-allowed;
 }
 
+/* Game section styles */
+#game {
+  margin-top: 40px;
+  margin-bottom: 0px
+}
+
+.game-controls {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+#game-board {
+  display: none;   /* iš pradžių lenta nematoma */
+}
+
+.game-board {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 12px;
+  min-height: 150px;
+  padding: 15px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.25);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Kortelės (bus naudojamos vėliau JS'e) */
+.game-card {
+  height: 90px;
+  border-radius: 8px;
+  background: #1d1d1d;
+  border: 2px solid #ff6600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.game-card.flipped {
+  background: #ff6600;
+  color: #000;
+}
+
+.game-message {
+  min-height: 30px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffddaa;
+}
+
+.game-stats-card {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  border: 1px solid #ff6600;
+}
+
+.game-stats-card h5 {
+  margin-bottom: 10px;
+  color: #ffddaa;
+}
+
 
 @keyframes gradientFlow {
   0%   { background-position: 0% 50%; }

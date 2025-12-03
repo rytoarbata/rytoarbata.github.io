@@ -104,7 +104,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function updateSubmitState() {
     let allValid = true;
     for (const name in fields) {
-      // Tikrinam tyliai – be klaidų rodymo
       if (!validateField(name, false)) {
         allValid = false;
       }
@@ -114,12 +113,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Švelnesnis telefono apdorojimas: išvalo simbolius, padeda +370 tik jei aišku
   function handlePhoneInput(e) {
     let digits = e.target.value.replace(/\D/g, "");
 
     // Konvertuojam dažniausius variantus
-    if (digits.startsWith("86")) {
+    if (digits.startsWith("06")) {
       // 86xxxxxxx -> 3706xxxxxxx
       digits = "3706" + digits.slice(2);
     } else if (digits.startsWith("6")) {
@@ -199,14 +197,274 @@ document.addEventListener("DOMContentLoaded", function () {
 
     showSuccessPopup();
   });
-});
 
-function showSuccessPopup() {
-  const popup = document.getElementById("success-popup");
-  if (!popup) return;
-  popup.classList.add("show");
+  /* ====== ŽAIDIMO KODAS  ====== */
 
-  setTimeout(() => {
-    popup.classList.remove("show");
-  }, 2500);
+  const gameBoard = document.getElementById("game-board");
+  const gameDifficultySelect = document.getElementById("game-difficulty");
+  const gameStartBtn = document.getElementById("game-start-btn");
+  const gameResetBtn = document.getElementById("game-reset-btn");
+  const gameMovesSpan = document.getElementById("game-moves");
+  const gameMatchesSpan = document.getElementById("game-matches");
+  const gameMessageDiv = document.getElementById("game-message");
+  const bestEasySpan = document.getElementById("best-easy");
+  const bestHardSpan = document.getElementById("best-hard");
+  const gameTimerSpan = document.getElementById("game-timer");
+
+  let gameRunning = false; // ar žaidimas šiuo metu aktyvus
+
+  // Duomenų rinkinys – bent 6 unikalūs elementai
+  const cardIcons = [
+    "⚡", "💻", "🐱", "📐", "📡", "🔋",
+    "🤖", "🧠", "🎧", "📊", "🔌", "🛰️"
+  ];
+
+  // Būsena
+  let currentCards = [];
+  let moves = 0;
+  let matches = 0;
+  let totalPairs = 0;
+
+  let firstCard = null;
+  let secondCard = null;
+  let lockBoard = false;
+
+  // Laikmatis
+  let timerInterval = null;
+  let elapsedSeconds = 0;
+
+  function updateTimerDisplay() {
+    if (gameTimerSpan) {
+      gameTimerSpan.textContent = `${elapsedSeconds} s`;
+    }
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  function startTimer() {
+    // pradeda skaičiuoti nuo 0 kiekvienam naujam žaidimui
+    stopTimer();
+    elapsedSeconds = 0;
+    updateTimerDisplay();
+
+    timerInterval = setInterval(() => {
+      elapsedSeconds++;
+      updateTimerDisplay();
+    }, 1000);
+  }
+
+  function resetSelection() {
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+  }
+
+  function resetGameState() {
+    moves = 0;
+    matches = 0;
+    totalPairs = 0;
+    resetSelection();
+    stopTimer();
+    elapsedSeconds = 0;
+    updateTimerDisplay();
+
+    if (gameMovesSpan) gameMovesSpan.textContent = "0";
+    if (gameMatchesSpan) gameMatchesSpan.textContent = "0";
+    if (gameMessageDiv) gameMessageDiv.textContent = "";
+  }
+
+  // Highscore iš localStorage
+  function loadBestScores() {
+    const bestEasy = localStorage.getItem("memoryBest_easy");
+    const bestHard = localStorage.getItem("memoryBest_hard");
+
+    if (bestEasySpan) bestEasySpan.textContent = bestEasy ? bestEasy : "-";
+    if (bestHardSpan) bestHardSpan.textContent = bestHard ? bestHard : "-";
+  }
+
+  function updateBestScoreIfNeeded() {
+    if (!gameDifficultySelect) return;
+
+    const difficulty = gameDifficultySelect.value === "hard" ? "hard" : "easy";
+    const key = difficulty === "hard" ? "memoryBest_hard" : "memoryBest_easy";
+
+    const currentBestStr = localStorage.getItem(key);
+    const currentBest = currentBestStr ? parseInt(currentBestStr, 10) : null;
+
+    // mažesnis ėjimų skaičius = geresnis rezultatas
+    if (currentBest === null || moves < currentBest) {
+      localStorage.setItem(key, moves.toString());
+
+      if (difficulty === "hard" && bestHardSpan) {
+        bestHardSpan.textContent = moves.toString();
+      } else if (difficulty === "easy" && bestEasySpan) {
+        bestEasySpan.textContent = moves.toString();
+      }
+    }
+  }
+
+  // Lentos išdėstymas pagal sudėtingumą
+  function applyBoardLayout() {
+    if (!gameBoard || !gameDifficultySelect) return;
+
+    if (gameDifficultySelect.value === "hard") {
+      // 6x4 lenta
+      gameBoard.style.gridTemplateColumns = "repeat(6, minmax(60px, 1fr))";
+    } else {
+      // 4x3 lenta
+      gameBoard.style.gridTemplateColumns = "repeat(4, minmax(80px, 1fr))";
+    }
+  }
+
+  // Pasirenkam kiek unikalių ikonų pagal sudėtingumą ir sugeneruojam poras
+  function getCardsForDifficulty() {
+    if (!gameDifficultySelect) return [];
+
+    let uniqueCount;
+    switch (gameDifficultySelect.value) {
+      case "hard":   // 6x4 = 24 kortelės → 12 porų
+        uniqueCount = 12;
+        break;
+      case "easy":   // 4x3 = 12 kortelių → 6 porų
+      default:
+        uniqueCount = 6;
+        break;
+    }
+
+    uniqueCount = Math.min(uniqueCount, cardIcons.length);
+    const base = cardIcons.slice(0, uniqueCount);
+
+    const pairArray = [...base, ...base]; // poros
+
+    // Permaišom
+    for (let i = pairArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pairArray[i], pairArray[j]] = [pairArray[j], pairArray[i]];
+    }
+
+    totalPairs = uniqueCount;
+    return pairArray;
+  }
+
+  // Kortelės paspaudimas (apvertimas)
+  function handleCardClick(e) {
+    const card = e.currentTarget;
+
+    if (!gameRunning) return;  
+    if (lockBoard) return;                     
+    if (card === firstCard) return;           
+    if (card.classList.contains("flipped")) return;
+
+    // apverčiam kortelę ir parodom turinį
+    card.classList.add("flipped");
+    card.textContent = card.dataset.icon;
+
+    if (!firstCard) {
+      firstCard = card;
+      return;
+    }
+
+    // antroji kortelė
+    secondCard = card;
+    moves++;
+    if (gameMovesSpan) gameMovesSpan.textContent = moves.toString();
+
+    checkForMatch();
+  }
+
+  function checkForMatch() {
+    const isMatch = firstCard.dataset.icon === secondCard.dataset.icon;
+
+    if (isMatch) {
+      // Paliekam atvertas – jų spausti daugiau negalima
+      firstCard.style.pointerEvents = "none";
+      secondCard.style.pointerEvents = "none";
+      matches++;
+      if (gameMatchesSpan) gameMatchesSpan.textContent = matches.toString();
+
+      resetSelection();
+
+      // Laimėjimo pranešimas + highscore + stop timer
+      if (matches === totalPairs) {
+        if (gameMessageDiv) gameMessageDiv.textContent = "Laimėjote!";
+        stopTimer();
+        updateBestScoreIfNeeded();
+      }
+    } else {
+      // Užrakinam lentą ir po trumpo laiko užverčiam abi
+      lockBoard = true;
+      setTimeout(() => {
+        firstCard.classList.remove("flipped");
+        firstCard.textContent = "";
+        secondCard.classList.remove("flipped");
+        secondCard.textContent = "";
+        resetSelection();
+      }, 800);
+    }
+  }
+
+  // Dinaminis lentos generavimas
+  function renderBoard() {
+    if (!gameBoard) return;
+
+    gameBoard.innerHTML = "";
+    currentCards = getCardsForDifficulty();
+    resetSelection();
+
+    currentCards.forEach((icon, index) => {
+      const card = document.createElement("div");
+      card.className = "game-card";
+      card.dataset.index = index;
+      card.dataset.icon = icon;
+      card.textContent = ""; // iš pradžių – paslėptas turinys
+
+      card.addEventListener("click", handleCardClick);
+
+      gameBoard.appendChild(card);
+    });
+  }
+
+  function startGame() {
+    resetGameState();
+    applyBoardLayout();
+    gameBoard.style.display = "grid";
+    renderBoard();
+    // laikmatis turi startuoti, kai paspaudžiamas „Start“ (ir „Atnaujinti“ – naujas žaidimas)
+    startTimer();
+    gameRunning = true;
+  }
+
+  if (gameStartBtn) {
+    gameStartBtn.addEventListener("click", startGame);
+  }
+
+  if (gameResetBtn) {
+    gameResetBtn.addEventListener("click", startGame);
+  }
+
+  if (gameDifficultySelect) {
+    gameDifficultySelect.addEventListener("change", () => {
+      // pakeitus sudėtingumą – nauja lenta ir reset, laikmatis neprivalo tęstis
+      resetGameState();
+      applyBoardLayout();
+      gameBoard.style.display = "none"; 
+      gameRunning = false;
+    });
+  }
+
+  // Įkėlus puslapį – nuskaityti best score iš localStorage ir atvaizduoti
+  loadBestScores();
+  // Pradinė lenta (be auto starto) – kad kažką matytų, bet laikmatis neskaičiuoja, kol nepaspaustas Start
+  if (gameBoard && gameDifficultySelect) {
+    resetGameState();
+    applyBoardLayout();
+    gameBoard.style.display = "none";
+    gameRunning = false;
+  }
 }
+)

@@ -323,6 +323,64 @@
         <div id="success-popup" class="success-popup">Duomenys pateikti sėkmingai!</div>
       </div>
     </section>
+        <!-- Game Section -->
+    <section id="game" class="game section">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Mano Žaidimas</h2>
+        <p>Atminties kortelių žaidimas su pasirenkamu sudėtingumo lygiu.</p>
+      </div>
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <!-- Valdikliai: sudėtingumas + mygtukai -->
+        <div class="row align-items-center mb-4 game-controls">
+          <div class="col-md-4">
+            <label for="game-difficulty" class="form-label">Pasirinkite sudėtingumo lygį:</label>
+              <label for="game-difficulty" class="form-label">Pasirinkite sudėtingumo lygį:</label>
+              <select id="game-difficulty" class="form-select">
+                <option value="easy">Lengvas (4x3)</option>
+                <option value="hard">Sunkus (6x4)</option>
+              </select>
+
+          </div>
+
+          <div class="col-md-4 text-center mt-3 mt-md-0">
+            <button id="game-start-btn" class="btn btn-primary me-2">Start</button>
+            <button id="game-reset-btn" class="btn btn-secondary">Atnaujinti</button>
+          </div>
+
+        <!-- Žaidimų lenta + statistika šalia -->
+        <div class="row g-4 align-items-start mt-2">
+          <div class="col-lg-8">
+            <!-- Žaidimų lenta -->
+            <div id="game-board" class="game-board">
+              <!-- JS sugeneruos korteles -->
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <!-- Statistika šalia lentos -->
+            <div class="game-stats-card">
+              <h5>Žaidimo statistika</h5>
+              <p class="mb-1">Ėjimų skaičius: <span id="game-moves">0</span></p>
+              <p class="mb-1">Sutapusių porų skaičius: <span id="game-matches">0</span></p>
+              <hr>
+              <p class="mb-1">Geriausias rezultatas (Lengvas): <span id="best-easy">-</span> ėjimai</p>
+              <p class="mb-1">Geriausias rezultatas (Sunkus): <span id="best-hard">-</span> ėjimai</p>
+              <hr>
+              <p class="mb-0">Laikmatis: <span id="game-timer">0 s</span></p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Laimėjimo pranešimas -->
+        <div id="game-message" class="game-message text-center mt-4">
+          <!-- Pvz.: "Sveikiname! Laimėjote!" -->
+        </div>
+
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer id="footer" class="footer position-relative">
